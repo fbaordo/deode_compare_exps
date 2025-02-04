@@ -26,8 +26,8 @@ def get_accPrepFromGrib(grbFile,grbFile2):
     tgrp2 = myFC2.select(shortName="tgrp")
     tgrp1 = myFC.select(shortName="tgrp")
 
-    tp2 = tirf2 + tsnowp2 + tgrp2
-    tp1 = tirf1 + tsnowp1 + tgrp1
+    tp2 = tirf2 + tsnowp2 + tgrp2 
+    tp1 = tirf1 + tsnowp1 + tgrp1 
 
     acc_tp = tp2 - tp1
     
@@ -140,6 +140,10 @@ def plot_compare_data(dataExps, latExps, lonExps, expsLabel, strUnitsExps, var,
         strExp    = expsLabel[nE]
         strUnit   = strUnitsExps[nE]
 
+        #print('lon shape: ' + str(mylon.shape))
+        #print('lat shape: ' + str(mylat.shape))
+        #print('data shape: ' + str(data2Plot.shape))
+
         eMin = str('{:.2f}'.format(np.nanmin(data2Plot)))
         eMax = str('{:.2f}'.format(np.nanmax(data2Plot)))
         eMean = str('{:.2f}'.format(np.nanmean(data2Plot)))
@@ -169,7 +173,7 @@ def plot_compare_data(dataExps, latExps, lonExps, expsLabel, strUnitsExps, var,
             myStep = int(stepmap)
         
         bounds = np.arange(myMin,myMax,myStep)
-
+        #contourf pcolor
         im = plt.pcolormesh(mylon, mylat, data2Plot, 
                             transform=ccrs.PlateCarree(),cmap=strCmap, 
                             vmin=bounds[0], vmax=bounds[len(bounds)-1])                    
@@ -217,6 +221,27 @@ def plot_compare_data(dataExps, latExps, lonExps, expsLabel, strUnitsExps, var,
     #plt.xlim([XminLim, XmaxLim])
     #plt.ylim([YminLim, YmaxLim])
     plt.legend()
+
+    # box plot
+    myList = []
+    myDataList = []
+
+    nExps = len(expsLabel)
+
+    for nE in range (0,nExps):
+        myList.append(expsLabel[nE])
+        myDataList.append(np.ravel(dataExps[nE]))
+    
+    x_ticks_labels = myList
+    x_models = np.linspace(1, nExps,nExps)
+
+    ax = plt.subplot(figRowlNum, figColNum, int(len(expsLabel)+2))
+
+    plt.boxplot(myDataList, showmeans=True)
+        
+    plt.grid(True)
+    plt.xticks(x_models, x_ticks_labels,rotation=45)
+    plt.ylabel(var, fontsize=10, fontweight="bold")
 
     fig.tight_layout()
     
