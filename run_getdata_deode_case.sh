@@ -1,50 +1,62 @@
 #!/bin/bash
 
 #SBATCH --qos=np
-#SBATCH --time=04:30:00
+#SBATCH --time=01:30:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --job-name=run_getdata_deode_case
 #SBATCH -o run_getdata_deode_case_%j.out
 #SBATCH -e run_getdata_deode_case_%j.err
-#SBATCH --job-name=run_getdata_deode_case
 
-# Xiaohua
-# 20240926 - flooding - peak around 15 UTC on 27 Sep
-#/ec/res4/scratch/nhe/deode/CY46h1_HARMONIE_AROME_DAN_1500x1500_500m_v1/archive/2024/09/26/00
-#/ec/res4/scratch/nhe/deode/CY46h1_HARMONIE_AROME_DAN_1500x1500_500m_v1/archive/2024/09/27/00
+#############################################################################################
+# Prepare grib data before plotting
+# ASSUMPTIONS:
+# - deode experiments are expected in local folder on ATOS:
+#   sourcePath=/ec/res4/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
+# - target path where to store data:
+#   targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
+# - HRES/DT are retrieved using a MARS request
+#############################################################################################
 
-# 20241214 - storm - peak around midnight 20241216 
-#/ec/res4/scratch/nhe/deode/CY46h1_HARMONIE_AROME_DAN_1500x1500_500m_v1/archive/2024/12/14/00
-#/ec/res4/scratch/nhe/deode/CY46h1_HARMONIE_AROME_DAN_1500x1500_500m_v1/archive/2024/12/15/00
-
+# Analysis time
 YYYY=2024
-MM=11
-DD=22
+MM=12
+DD=04
 HH=00
 
-expID=CY46h1_HARMONIE_AROME_IRL_1500x1500_500m_v1 #"CY48t3_ALARO_IRL_1500x1500_500m_v1  #CY48t3_AROME_IRL_1500x1500_500m_v1 #CY46h1_HARMONIE_AROME_DAN_1500x1500_500m_v1
-userID=nhe
+# expID
+expID=CY46h1_HARMONIE_AROME_nwp_NOR_20241204_1000m_20241204
+# UserID
+userID=sbt
+# expected string in grib file
+gribFilesId=GRIBPFDEOD+
 
-gribCopy=FALSE
-getHRES=TRUE
-getDT=TRUE
- 
+# active what data you want to get 
+gribCopy=TRUE
+getHRES=FALSE
+getDT=FALSE
+
+# if getHRES or getDT, configure below
+
+# Minimize data retrieval for HRES/DT retrieve only requested FC time steps and over a specifc lat/lon AREA 
 dtEXP=iekm
-# retrieve some FC time steps
-FC_TIME_STEP=(24 48)
+FC_TIME_STEP=(24 48) 
 
 # AREA to retrieve
 # North/West/South/East	latitude/longitude coordinates of sub-area
 # DK=59/4/52/18
-AREA=57/-15.5/48/-2.5
+# IR=57/-15.5/48/-2.5
+# NO=62.5/0/55.5/14
+AREA=62.5/0/55.5/14
 
 ##########
 # apply grib copy to original DEODE grib file
 ##########
 if [[ ${gribCopy} == "TRUE" ]] ; then
-	sourcePath=/ec/res4/scratch/miag/${expID}   #/ec/res4/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
-	gribFilesId=GRIBPFDEOD+
-	targetPath=/perm/miag/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
+
+	sourcePath=/ec/res4/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
+	
+	targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
 
 	./deode_grib_copy.sh ${sourcePath} ${gribFilesId} ${targetPath}
 fi
@@ -56,7 +68,7 @@ if [[ ${getHRES} == "TRUE" ]] ; then
 
 	DATE=${YYYY}${MM}${DD}
 	ANTIME=${HH}
-	targetPath=/perm/miag/deode_exps/${YYYY}${MM}${DD}${HH}/HRES
+	targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/HRES
 
 	if [ ! -d "${archDir}" ] ; then
 	  mkdir -p ${targetPath}
@@ -107,7 +119,7 @@ if [[ ${getDT} == "TRUE" ]] ; then
 
 	DATE=${YYYY}${MM}${DD}
 	ANTIME=${HH}
-	targetPath=/perm/miag/deode_exps/${YYYY}${MM}${DD}${HH}/DT
+	targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/DT
 
 	if [ ! -d "${archDir}" ] ; then
 	  mkdir -p ${targetPath}
