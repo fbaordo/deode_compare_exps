@@ -11,39 +11,53 @@ warnings.filterwarnings('ignore')
 #########################
 # configure case
 #########################
-# 2024092600 - flooding - peak around 15 UTC on 27 Sep
-# 2024121400 - storm - peak around midnight 20241216 
+# 2024092600 - flooding DK - peak around 15 UTC on 27 Sep
+# 2024121400 - storm DK - peak around midnight 20241216 
+# 2024120400 - Roger Norway case 
 
+# - deode experiments/HRES/DT grib files are expected in local folder on ATOS:
+#   /perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
+
+# top path
 topPath = '/perm/miag/deode_exps'
-anTime  = '2024112200'
 
-expsList = ['CY46h1_HARMONIE_AROME_IRL_1500x1500_500m_v1',
-            'CY48t3_ALARO_IRL_1500x1500_500m_v1',   #DT',
-            'CY48t3_AROME_IRL_1500x1500_500m_v1', 'DT','HRES']
+# Analysis time (YYYYMMDDHH)
+anTime  = '2024120400'
 
+# expID list
+expsList = ['CY46h1_HARMONIE_AROME_nwp_NOR_20241204_500morig_20241204',
+            'CY46h1_HARMONIE_AROME_nwp_NOR_20241204_1000m_20241204',   
+            'HRES']
+
+# GribId List for each experiment in expsList
 expsGribId = ['GRIBPFDEOD',
               'GRIBPFDEOD',
-              'GRIBPFDEOD', 'DT','HRES']
+              'HRES']
 
-expsLabel = ['CY46-HARMONIE-AROME',
-             'CY48-ALARO',
-             'CY48-AROME', 'DT','HRES']
+# Label for each experiment in expsList 
+expsLabel = ['LAM 500m',
+             'LAM 1000m',
+             'Global 9000m']
 
-#option: 'accPrep' 'windSpeed'
-varsToComapre = ['accPrep'] 
+#Seelct variable to plot, Available: 'accPrep' 'windSpeed'
+varsToComapre = ['windSpeed'] 
 
-# plots all time steps e.g. 1 to 48  
-#fcSteps = np.arange(1,49,1)
-#focus on  particular time steps
+# Select time steps to plots ('target valid time') 
+# plots all time steps e.g. 1 to 48 --> fcSteps = np.arange(1,49,1)
+# aotherwise, focus on  particular time steps
 fcSteps = np.arange(48,49,1) 
 
-# accumulated precipitation
+# Only for accumulated precipitation
 strAccPre = '24h'
 accPreStep = 24
 
+# Lat/Lon Domain
 # DK [18, 4, 52, 59]
-bbox = [-2.5, -15.5, 48, 57]
- # figure (subplots= maps*expNum + 1)
+# IR [-2.5, -15.5, 48, 57]
+# NO [0, 14, 55.5, 62.5]
+bbox = [0, 14, 55.5, 62.5]
+
+# figure (subplots= maps*expNum + 2) additional 2 plots: histogram + boxplot
 figRowlNum = 2 
 figColNum = 3
 figWidth  = 16 
@@ -153,4 +167,4 @@ for fcStep in fcSteps:
         plot_compare_data(dataExps, latExps, lonExps, expsLabel, strUnitsExps, var, 
                           strValidTime, bbox, strAccPre, 
                           figRowlNum, figColNum, figWidth, figHeight, pathDiagPlots,
-                          minmap=1, maxmap=60, stepmap=4, minHist=-0.5, maxHist=160, binHist=1)
+                          minmap=1, maxmap=26, stepmap=2, minHist=-0.5, maxHist=25, binHist=1)
