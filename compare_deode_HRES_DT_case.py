@@ -22,25 +22,34 @@ warnings.filterwarnings('ignore')
 topPath = '/perm/miag/deode_exps'
 
 # Analysis time (YYYYMMDDHH)
-anTime  = '2024120400'
+anTime  = '2025012700'
 
 # expID list
-expsList = ['CY46h1_HARMONIE_AROME_nwp_NOR_20241204_500morig_20241204',
-            'CY46h1_HARMONIE_AROME_nwp_NOR_20241204_1000m_20241204',   
+expsList = ['AROME_500m',
+            'HARMONIE_AROME_500m', 
+            'AROME_2000m', 
+            'HARMONIE_AROME_2000m',   
+            'DT',   
             'HRES']
 
 # GribId List for each experiment in expsList
 expsGribId = ['GRIBPFDEOD',
               'GRIBPFDEOD',
+              'GRIBPFDEOD',
+              'GRIBPFDEOD',
+              'DT',
               'HRES']
 
 # Label for each experiment in expsList 
-expsLabel = ['LAM 500m',
-             'LAM 1000m',
-             'Global 9000m']
+expsLabel = ['AROME 500m',
+             'H-AROME 500m',
+             'AROME 2000m',
+             'H-AROME 2000m',
+             'DT',
+             'HRES']
 
 #Seelct variable to plot, Available: 'accPrep' 'windSpeed'
-varsToComapre = ['windSpeed'] 
+varsToComapre = ['accPrep'] 
 
 # Select time steps to plots ('target valid time') 
 # plots all time steps e.g. 1 to 48 --> fcSteps = np.arange(1,49,1)
@@ -48,18 +57,26 @@ varsToComapre = ['windSpeed']
 fcSteps = np.arange(48,49,1) 
 
 # Only for accumulated precipitation
-strAccPre = '24h'
-accPreStep = 24
+strAccPre = '48h'
+accPreStep = 47
 
 # Lat/Lon Domain
 # DK [18, 4, 52, 59]
 # IR [-2.5, -15.5, 48, 57]
 # NO [0, 14, 55.5, 62.5]
-bbox = [0, 14, 55.5, 62.5]
+# 48/15.45/41.25/5.4
+bbox = [5.4, 15.45, 41, 48]
 
+# Customize colobar & histogram
+minmap=0 
+maxmap=190 
+stepmap=10 
+minHist=0 
+maxHist=350 
+binHist=5
 # figure (subplots= maps*expNum + 2) additional 2 plots: histogram + boxplot
 figRowlNum = 2 
-figColNum = 3
+figColNum = 4
 figWidth  = 16 
 figHeight = 12
 #################################
@@ -167,4 +184,4 @@ for fcStep in fcSteps:
         plot_compare_data(dataExps, latExps, lonExps, expsLabel, strUnitsExps, var, 
                           strValidTime, bbox, strAccPre, 
                           figRowlNum, figColNum, figWidth, figHeight, pathDiagPlots,
-                          minmap=1, maxmap=26, stepmap=2, minHist=-0.5, maxHist=25, binHist=1)
+                          minmap=minmap, maxmap=maxmap, stepmap=stepmap, minHist=minHist, maxHist=maxHist, binHist=binHist)

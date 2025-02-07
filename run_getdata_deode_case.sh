@@ -13,52 +13,59 @@
 # ASSUMPTIONS:
 # - deode experiments are expected in local folder on ATOS:
 #   sourcePath=/ec/res4/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
+#   NEW PATH STRUCTURE: sourcePath=/scratch/${userID}/DE_NWP/deode/${YYYY}/${MM}/${DD}/${HH}/flooding/1/${expID}
 # - target path where to store data:
 #   targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
 # - HRES/DT are retrieved using a MARS request
 #############################################################################################
 
 # Analysis time
-YYYY=2024
-MM=12
-DD=04
+YYYY=2025
+MM=01
+DD=27
 HH=00
 
 # expID
-expID=CY46h1_HARMONIE_AROME_nwp_NOR_20241204_1000m_20241204
+expIDList=(AROME_2000m  AROME_500m  HARMONIE_AROME_2000m  HARMONIE_AROME_500m)
 # UserID
-userID=sbt
+userID=nhad
 # expected string in grib file
 gribFilesId=GRIBPFDEOD+
 
 # active what data you want to get 
-gribCopy=TRUE
+gribCopy=FALSE
 getHRES=FALSE
-getDT=FALSE
+getDT=TRUE
 
 # if getHRES or getDT, configure below
 
 # Minimize data retrieval for HRES/DT retrieve only requested FC time steps and over a specifc lat/lon AREA 
 dtEXP=iekm
-FC_TIME_STEP=(24 48) 
+FC_TIME_STEP=(1 48) 
 
 # AREA to retrieve
 # North/West/South/East	latitude/longitude coordinates of sub-area
 # DK=59/4/52/18
 # IR=57/-15.5/48/-2.5
 # NO=62.5/0/55.5/14
-AREA=62.5/0/55.5/14
+# IT= 41.28, 5.4, 48, 15.42
+AREA=48/5.4/41.25/15.45
 
 ##########
 # apply grib copy to original DEODE grib file
 ##########
 if [[ ${gribCopy} == "TRUE" ]] ; then
 
-	sourcePath=/ec/res4/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
-	
-	targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
+																																	
+   for expID in "${expIDList[@]}"; do
 
+	#sourcePath=/ec/res4/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
+	sourcePath=/scratch/${userID}/DE_NWP/deode/${YYYY}/${MM}/${DD}/${HH}/flooding/1/${expID}
+	targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
 	./deode_grib_copy.sh ${sourcePath} ${gribFilesId} ${targetPath}
+
+  done
+
 fi
 
 ##########
@@ -150,7 +157,8 @@ RETRIEVE,
      STEP=${FCSTEP},
      TYPE=FC,
      LEVTYPE=SFC,
-     PARAM=49.128/165.128/166.128/167.128/228.128,
+     #PARAM=228.128,49.128/165.128/166.128/167.128/228.128,
+     PARAM=228.128, 
      TARGET=$myTarget
 EOF
 

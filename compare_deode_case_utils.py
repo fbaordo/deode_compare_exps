@@ -153,7 +153,7 @@ def plot_compare_data(dataExps, latExps, lonExps, expsLabel, strUnitsExps, var,
         
         ax = plt.subplot(figRowlNum, figColNum, int(nE+1), projection=ccrs.PlateCarree())
 
-        plt.title(strTitle, fontweight="bold")
+        plt.title(strTitle, fontweight="bold",fontsize=8)
 
         # default min/max for colorbar
         myMin = int(np.nanmin(data2Plot))
@@ -186,8 +186,10 @@ def plot_compare_data(dataExps, latExps, lonExps, expsLabel, strUnitsExps, var,
 
         if var == 'accPrep':
             cbar.set_label('mm', rotation=0, labelpad=5, fontsize=10, fontweight="bold")
+            cbar.ax.tick_params(rotation=45)
         else:
             cbar.set_label(strUnit, rotation=0, labelpad=5, fontsize=10, fontweight="bold")
+            cbar.ax.tick_params(rotation=45)
             
     
     # histogram
