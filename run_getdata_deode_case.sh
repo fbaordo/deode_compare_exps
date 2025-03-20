@@ -1,21 +1,25 @@
 #!/bin/bash
 
-#SBATCH --qos=np
+#SBATCH --qos=nf
 #SBATCH --time=01:30:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --job-name=run_getdata_deode_case
-#SBATCH -o run_getdata_deode_case_%j.out
-#SBATCH -e run_getdata_deode_case_%j.err
+#SBATCH -o sbatchlogs/run_getdata_deode_case_%j.out
+#SBATCH -e sbatchlogs/run_getdata_deode_case_%j.err
 
 #############################################################################################
 # Prepare grib data before plotting
 # ASSUMPTIONS:
-# - deode experiments are expected in local folder on ATOS:
-#   sourcePath=/ec/res4/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
-#   NEW PATH STRUCTURE: sourcePath=/scratch/${userID}/DE_NWP/deode/${YYYY}/${MM}/${DD}/${HH}/flooding/1/${expID}
+
+# - deode experiments are expected in local folder on ATOS (!!! CHECK THE RIGHT LOCATION and configure properly 'sourcePath' below in the script)
+#   sourcePath can be somenthing like: 
+#         /scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
+#         /scratch/${userID}/DE_NWP/deode/${YYYY}/${MM}/${DD}/${HH}/flooding/1/${expID}  (new workflow output structure)
+
 # - target path where to store data:
 #   targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
+
 # - HRES/DT are retrieved using a MARS request
 #############################################################################################
 
@@ -25,15 +29,18 @@ MM=01
 DD=27
 HH=00
 
-# expID
+# expID (to identify sourcePath)
 expIDList=(AROME_2000m  AROME_500m  HARMONIE_AROME_2000m  HARMONIE_AROME_500m)
-# UserID
+# UserID (to identify sourcePath)
 userID=nhad
-# expected string in grib file
+# expected string in DEODE grib file
 gribFilesId=GRIBPFDEOD+
 
 # active what data you want to get 
+
+# grib copy for DEODE grib files --> check deode_grib_copy.sh if you want to add other surface variables
 gribCopy=FALSE
+# HRES/DT MARS RETRIEVAL
 getHRES=FALSE
 getDT=TRUE
 
@@ -59,7 +66,8 @@ if [[ ${gribCopy} == "TRUE" ]] ; then
 																																	
    for expID in "${expIDList[@]}"; do
 
-	#sourcePath=/ec/res4/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
+        #!!! CHECK THE RIGHT LOCATION
+	#sourcePath=/scratch/${userID}/deode/${expID}/archive/${YYYY}/${MM}/${DD}/${HH}
 	sourcePath=/scratch/${userID}/DE_NWP/deode/${YYYY}/${MM}/${DD}/${HH}/flooding/1/${expID}
 	targetPath=/perm/${USER}/deode_exps/${YYYY}${MM}${DD}${HH}/${expID}
 	./deode_grib_copy.sh ${sourcePath} ${gribFilesId} ${targetPath}
@@ -157,8 +165,7 @@ RETRIEVE,
      STEP=${FCSTEP},
      TYPE=FC,
      LEVTYPE=SFC,
-     #PARAM=228.128,49.128/165.128/166.128/167.128/228.128,
-     PARAM=228.128, 
+     PARAM=228.128,49.128/165.128/166.128/167.128/228.128,
      TARGET=$myTarget
 EOF
 
